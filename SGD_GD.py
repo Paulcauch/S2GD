@@ -74,13 +74,12 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
 
         obj = problem.fun(x)
         nmin = norm(x-xtarget)
-        
+        objvals.append(obj)
        
         
         k += 1
         # Plot quantities of interest at the end of every epoch only
         if (k*nb) % n == 0:
-            objvals.append(obj)
             normits.append(nmin)
             if verbose:
                 print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8)]))  
