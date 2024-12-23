@@ -20,12 +20,15 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
             verbose: Boolean indicating whether information should be plot at every iteration (Default: False)
             
         Outputs:
-            x_output: Final iterate of the method (or average if average=1)
+            x_output: Final iterate of the method
             objvals: History of function values (Numpy array of length n_iter at most)
             normits: History of distances between iterates and optimum (Numpy array of length n_iter at most)
+            nbgradcomp : History of number of gradient evaluated at every iteration
     """
     objvals = []
     normits = []
+    nb_grad_comp = [0]
+
     L = problem.lipgrad()
     mu = problem.cvxval()
     kappa = problem.kappa_val
@@ -44,7 +47,7 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
         elif nu == 0:
             m = 8*(kappa - 1) / delta**2 + 8*kappa/delta + (2*kappa**2) / (kappa-1)
             m = int(m) + 1
-        #n_iter = int(np.log(1/eps_tol)) + 1 
+        n_iter = int(np.log(1/eps_tol)) + 1 
         h = h / 10
         print("h=",h,"m=",m,"n_iter=",n_iter)
 
@@ -82,10 +85,11 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
         ik = np.random.choice(n,n,replace=False)
         for i in ik : 
             x = x - h * problem.grad_i(x,i)
-            obj = problem.fun(x)
-            objvals.append(obj)
+        obj = problem.fun(x)
+        objvals.append(obj)
         nmin = norm(x-xtarget)
-        nx = norm(x)
+        normits.append(nmin)
+        nb_grad_comp.append(n)
 
         if verbose : 
             print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8)]))
@@ -114,23 +118,23 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
         
         #Update
         x = y 
+
+        k += 1
         
         nx = norm(x) 
         obj = problem.fun(x)
         nmin = norm(x-xtarget)
-        
-        k += 1
 
-        for _ in range(n+2*t):
-            objvals.append(obj)
+        objvals.append(obj)
         normits.append(nmin)
+        nb_grad_comp.append(nb_grad_comp[-1] + n + 2*t)
 
         if verbose:
             print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8),("%.2e" % t).rjust(8)]))
 
         if abs(problem.fun(x)-problem.fun(xtarget)) < eps_tol*abs(problem.fun(x0)-problem.fun(xtarget)):
-            print(problem.fun(x)-problem.fun(xtarget))
-            print(eps_tol*abs(problem.fun(x0)-problem.fun(xtarget)))
+            # print(problem.fun(x)-problem.fun(xtarget))
+            # print(eps_tol*abs(problem.fun(x0)-problem.fun(xtarget)))
             print("Algorithm end because it reached precision.")
             break
     
@@ -139,4 +143,4 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
     # Outputs
     x_output = x.copy()
     
-    return x_output, np.array(objvals), np.array(normits)
+    return x_output, np.array(objvals), np.array(normits), np.array(nb_grad_comp)
