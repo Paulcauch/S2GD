@@ -50,10 +50,12 @@ def plot_with_time(times, obj_functions, name_of_models):
 
     for k in range(N):
         final_value_f = obj_functions[k][-1]
-
+        print(len(times[k]))
         plt.semilogy(times[k], np.array(obj_functions[k]) - final_value_f, label=name_of_models[k], marker = 's', color=colors[k])
         plt.xlabel('time (s)')
         plt.ylabel(r"$||f(x) - f(x^*)||$")
         plt.title('Comparison between the different models')
+        plt.legend()
 
+    plt.grid()
     plt.show()
