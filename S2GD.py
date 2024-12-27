@@ -1,6 +1,6 @@
 import numpy as np 
 from scipy.linalg import norm 
-
+import time 
 
 #S2GD and S2GD+
 def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose=True): 
@@ -27,6 +27,7 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
     """
     objvals = []
     normits = []
+    times = [0]
     nb_grad_comp = [0]
 
     L = problem.lipgrad()
@@ -68,6 +69,8 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
     # Current distance to the optimum
     nmin = norm(x-xtarget)
     normits.append(nmin)
+     
+    start_time = time.time()
     
     if verbose:
         # Display initial quantities of interest
@@ -97,7 +100,7 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
 
     # Main loop
     while (k < n_iter and nx < 10**100):
-
+       
         #Compute full gradient 
         g = problem.grad(x)
 
@@ -137,10 +140,13 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
             # print(eps_tol*abs(problem.fun(x0)-problem.fun(xtarget)))
             print("Algorithm end because it reached precision.")
             break
+
+        end_time = time.time()
+        times.append(end_time - start_time)
     
     #print(problem.fun(x)-problem.fun(xtarget))
     #print(eps_tol*abs(problem.fun(x0)-problem.fun(xtarget)))
     # Outputs
     x_output = x.copy()
     
-    return x_output, np.array(objvals), np.array(normits), np.array(nb_grad_comp)
+    return x_output, np.array(objvals), np.array(normits), np.array(nb_grad_comp), times

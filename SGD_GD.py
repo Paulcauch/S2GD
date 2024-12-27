@@ -1,6 +1,6 @@
 import numpy as np 
 from scipy.linalg import norm 
-
+import time
 
 
 def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_replace=False,verbose=True,fast=False): 
@@ -32,6 +32,7 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
     """
     objvals = []
     normits = []
+    times = [0]
     nb_grap_comp = [0]
 
     L = problem.lipgrad()
@@ -49,7 +50,7 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
     # Current distance to the optimum
     nmin = norm(x-xtarget)
     normits.append(nmin)
-    
+    start_time = time.time()
     if verbose:
         # Display initial quantities of interest
         print("Stochastic Gradient, batch size=",nb,"/",n)
@@ -83,6 +84,8 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
             obj = problem.fun(x)
             nmin = norm(x-xtarget)
             objvals.append(obj)
+            end_time = time.time()
+            times.append(end_time - start_time)
             nb_grap_comp.append(k*nb)
             normits.append(nmin)
 
@@ -93,6 +96,8 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
                 obj = problem.fun(x)
                 nmin = norm(x-xtarget)
                 objvals.append(obj)
+                end_time = time.time()
+                times.append(end_time - start_time)
                 nb_grap_comp.append(k*nb)
                 normits.append(nmin)
 
@@ -100,9 +105,12 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
                     print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8)]))  
 
 
+
     # Plot quantities of interest for the last iterate (if needed)
     if (k*nb) % n > 0:
         objvals.append(obj)
+        end_time = time.time()
+        times.append(end_time - start_time)
         normits.append(nmin)
         if verbose:
             print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8)]))              
@@ -110,4 +118,4 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
     # Outputs
     x_output = x.copy()
     
-    return x_output, np.array(objvals), np.array(normits), nb_grap_comp
+    return x_output, np.array(objvals), np.array(normits), nb_grap_comp, times

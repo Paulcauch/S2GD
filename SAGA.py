@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.linalg import norm
-
+import time
 
 def SAGA(x0,problem,xtarget,gamma,eps_tol,n_iter=100,verbose=True,fast=False): 
     """
@@ -23,6 +23,7 @@ def SAGA(x0,problem,xtarget,gamma,eps_tol,n_iter=100,verbose=True,fast=False):
     """
     objvals = []
     normits = []
+    times = [0]
     nb_grad_comp = [0]
 
     L = problem.lipgrad()
@@ -59,7 +60,7 @@ def SAGA(x0,problem,xtarget,gamma,eps_tol,n_iter=100,verbose=True,fast=False):
         print(' | '.join([name.center(8) for name in ["iter", "fval", "normit"]]))
         print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8)]))
 
-
+    start_time = time.time()
     # Main loop
     while (k < n_iter and nx < 10**100):
 
@@ -90,6 +91,8 @@ def SAGA(x0,problem,xtarget,gamma,eps_tol,n_iter=100,verbose=True,fast=False):
             obj = problem.fun(x)
             nmin = norm(x-xtarget)
             objvals.append(obj)
+            end_time = time.time()
+            times.append(end_time - start_time)
             normits.append(nmin)
             nb_grad_comp.append(k)
 
@@ -102,6 +105,8 @@ def SAGA(x0,problem,xtarget,gamma,eps_tol,n_iter=100,verbose=True,fast=False):
                 obj = problem.fun(x)
                 nmin = norm(x-xtarget)
                 objvals.append(obj)
+                end_time = time.time()
+                times.append(end_time - start_time)
                 normits.append(nmin)
                 nb_grad_comp.append(k)
 
@@ -117,4 +122,4 @@ def SAGA(x0,problem,xtarget,gamma,eps_tol,n_iter=100,verbose=True,fast=False):
     # Outputs
     x_output = x.copy()
     
-    return x_output, np.array(objvals), np.array(normits), np.array(nb_grad_comp)
+    return x_output, np.array(objvals), np.array(normits), np.array(nb_grad_comp), times 
