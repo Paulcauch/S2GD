@@ -50,3 +50,14 @@ def generate_pb_parameters(x, n, d, target_kappa, lbda, std=1e-5, corr=0.5):
     y = A_adjusted.dot(x) + noise
 
     return A_adjusted, y
+
+def generate_sparse_x(d,sparsity):
+    
+    sparsity = 1 - sparsity
+    idx = np.arange(d)
+    mask = np.random.binomial(1,sparsity,d)
+    x = (-1)**idx * np.exp(-idx / 10.)
+    x = x * mask
+
+    return x 
+

@@ -17,10 +17,13 @@ def plot_with_nb_gradients(nb_gradients, obj_functions, name_of_models):
     """
     N = len(obj_functions)
     colors = ['red', 'blue', 'green', 'black', 'pink']
+    final_value_f = 1
 
     for k in range(N):
-        final_value_f = obj_functions[k][-1]
-
+        if  obj_functions[k][-1] < final_value_f:
+            final_value_f = obj_functions[k][-1]
+    
+    for k in range (N):
         plt.semilogy(nb_gradients[k], np.array(obj_functions[k]) - final_value_f, label=name_of_models[k], marker = 's', color=colors[k])
         plt.xlabel('Stochastic gradient evaluations')
         plt.ylabel(r"$||f(x) - f(x^*)||$")
@@ -48,9 +51,14 @@ def plot_with_time(times, obj_functions, name_of_models):
     N = len(obj_functions)
     colors = ['red', 'blue', 'green', 'black', 'pink']
 
+    final_value_f = 1
+
     for k in range(N):
-        final_value_f = obj_functions[k][-1]
-        print(len(times[k]))
+        if  obj_functions[k][-1] < final_value_f:
+            final_value_f = obj_functions[k][-1]
+
+    for k in range(N):
+        #print(len(times[k]))
         plt.semilogy(times[k], np.array(obj_functions[k]) - final_value_f, label=name_of_models[k], marker = 's', color=colors[k])
         plt.xlabel('time (s)')
         plt.ylabel(r"$||f(x) - f(x^*)||$")

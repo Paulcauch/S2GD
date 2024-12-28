@@ -39,16 +39,36 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
 
 
     #Compute best parameters
+    #old
+    # if h < 0 : 
+    #     delta = eps_tol ** (1/n_iter)
+    #     h = 1 / ((4/delta) * (L - mu) + 2*L)
+    #     if nu == mu: 
+    #         m = (4*(kappa - 1)/delta + 2*kappa) * np.log(2/delta + (2*kappa - 1)/(kappa - 1))
+    #         m = int(m) + 1
+    #     elif nu == 0:
+    #         m = 8*(kappa - 1) / delta**2 + 8*kappa/delta + (2*kappa**2) / (kappa-1)
+    #         m = int(m) + 1
+    #     n_iter = int(np.log(1/eps_tol)) + 1 
+    #     h = h / 10
+    #     print("h=",h,"m=",m,"n_iter=",n_iter)
+
+    #new 
     if h < 0 : 
+        n_iter = int(np.floor(np.log( 1 / eps_tol )) + 1)
         delta = eps_tol ** (1/n_iter)
-        h = 1 / ((4/delta) * (L - mu) + 2*L)
-        if nu == mu: 
-            m = (4*(kappa - 1)/delta + 2*kappa) * np.log(2/delta + (2*kappa - 1)/(kappa - 1))
+        if nu == 0 :
+            m = 8*(kappa - 1) / delta**2 + 8*kappa/delta 
             m = int(m) + 1
-        elif nu == 0:
-            m = 8*(kappa - 1) / delta**2 + 8*kappa/delta + (2*kappa**2) / (kappa-1)
-            m = int(m) + 1
-        n_iter = int(np.log(1/eps_tol)) + 1 
+            h = 1 / ((4/delta) * (L - mu) + 4*L)
+        elif nu == mu :    
+            h = 1 / ((4/delta) * (L - mu) + 2*L)
+            if kappa < 2 : 
+                m = (4*(kappa - 1)/delta + 2*kappa) * np.log(2/delta + (2*kappa - 1)/(kappa - 1))
+                m = int(m) + 1
+            else :
+                m = (6*kappa/delta) * np.log(5/delta)
+                m = int(m) + 1
         h = h / 10
         print("h=",h,"m=",m,"n_iter=",n_iter)
 
@@ -94,9 +114,14 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
         normits.append(nmin)
         nb_grad_comp.append(n)
 
+        end_time = time.time()
+        times.append(end_time - start_time)
+
         if verbose : 
             print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8)]))
             print("Running S2GD with t=", alpha*n)
+            print(' | '.join([name.center(8) for name in ["iter", "fval", "normit","t"]]))
+            print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8),("%.2e" % t).rjust(8)]))
 
     # Main loop
     while (k < n_iter and nx < 10**100):
