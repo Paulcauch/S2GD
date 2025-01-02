@@ -1,2 +1,2 @@
-# S2GD
-Implementation of S2GD and S2GD+ and comparison with others algorithms (GD,SGD,SAG). 
+# Variance reduction of Stochastic Gradient Descent
+Implementation of S2GD,S2GD+,SAGA and SGD. Comparison of the algorithms. 
