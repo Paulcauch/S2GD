@@ -52,7 +52,7 @@ def generate_pb_parameters(x, n, d, target_kappa, lbda, std=1e-5, corr=0.5):
     return A_adjusted, y
 
 def generate_sparse_x(d,sparsity):
-    
+
     sparsity = 1 - sparsity
     idx = np.arange(d)
     mask = np.random.binomial(1,sparsity,d)
@@ -61,3 +61,43 @@ def generate_sparse_x(d,sparsity):
 
     return x 
 
+def calculate_c_S2GD(L, mu, nu, h, m, beta):
+    """
+    Calculate the theoretical convergence constant c of S2GD 
+    E[f(x_k)-f(x^*)] < c^k(f(x_0)-f(x^*))
+    """
+    term1 = ((1 - nu * h)**m) / (beta * mu * h * (1 - 2 * L * h))
+    term2 = (2 * (L - mu) * h) / (1 - 2 * L * h)
+    return term1 + term2
+
+
+def calculate_c_S2GD_uniform(L, mu, nu, h):
+    """
+    Calculate the theoretical convergence constant c of S2GD for the uniform distribution
+    E[f(x_k)-f(x^*)] < c^k(f(x_0)-f(x^*))
+    """
+    term1 = ((1 - nu * h)) / (mu * h * (1 - 2 * L * h))
+    term2 = ((L - mu) * h) / (1 - 2 * L * h)
+    return term1 + term2
+
+def calculate_bound_sto_grad(step,L,sigma,mu,f_star,f_start,k):
+    """
+    Calculate the theoretical bound of SGD 
+    E[f(x_k)-f(x^*)] < (step * L * sigma) / (2 * mu) + (1 - step*mu)**k * (f_start-f_star + (step * L * sigma) / (mu))
+    """
+    term1 = (step * L * sigma) / (2 * mu)
+    term2 = (1 - step*mu)**k * (f_start-f_star + (step * L * sigma) / (mu))
+    return term1 + term2
+
+def get_an_approximate_sigma_sgd(pb,d,n,num):
+    """
+    Compute an approximate of the variance of the SGD 
+    """
+    sigma_squareds = []
+    for _ in range (num):
+        iteratebis = np.random.randn(d) 
+        grad_individual = [pb.grad_i(iteratebis,i) for i in range(n)]
+        grad_full = pb.grad(iteratebis)
+        sigma_squared = np.mean([np.linalg.norm(grad_individual[i] - grad_full)**2 for i in range(n)])
+        sigma_squareds.append(sigma_squared)
+    return np.mean(sigma_squareds)
