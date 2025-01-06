@@ -3,7 +3,7 @@ from scipy.linalg import norm
 import time
 
 
-def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_replace=False,verbose=True,fast=False): 
+def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_replace=False,verbose=True,fast=False,adapting_step=False,patience=3,tolerance_adapt=1e-3): 
     """
         Stochastic gradient descent.
         
@@ -70,7 +70,7 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
         sg = (1/nb)*sg
             
         if stepchoice==0:
-            x[:] = x - (step0/L) * sg
+            x[:] = x - step0 * sg
         elif stepchoice>0:
             sk = float(step0/((k+1)**stepchoice))
             x[:] = x - sk * sg
@@ -104,6 +104,21 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
                 if verbose:
                     print(' | '.join([("%d" % k).rjust(8),("%.2e" % obj).rjust(8),("%.2e" % nmin).rjust(8)]))  
 
+        if adapting_step:
+            if ((k*nb) % n == 0 or not(fast)) and step0 > 1e-6:
+                if len(objvals) > patience:
+                    recent_objvals = objvals[-patience:]
+                    relative_change = np.abs(recent_objvals[-1] - recent_objvals[0]) / np.abs(recent_objvals[0])
+                    if relative_change < tolerance_adapt:
+                        stagnation_counter += 1
+                        if stagnation_counter >= patience:
+                            step0 /= 2  
+                            stagnation_counter = 0  
+                            tolerance_adapt /= 2 
+                            if verbose:
+                                print(f"Reducing step size to {step0:.2e} due to stagnation.")
+                    else:
+                        stagnation_counter = 0  
 
 
     # Plot quantities of interest for the last iterate (if needed)

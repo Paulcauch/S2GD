@@ -40,45 +40,45 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
 
     #Compute best parameters
     #old
-    # if h < 0 : 
-    #     delta = eps_tol ** (1/n_iter)
-    #     h = 1 / ((4/delta) * (L - mu) + 2*L)
-    #     if nu == mu: 
-    #         m = (4*(kappa - 1)/delta + 2*kappa) * np.log(2/delta + (2*kappa - 1)/(kappa - 1))
-    #         m = int(m) + 1
-    #     elif nu == 0:
-    #         m = 8*(kappa - 1) / delta**2 + 8*kappa/delta + (2*kappa**2) / (kappa-1)
-    #         m = int(m) + 1
-    #     n_iter = int(np.log(1/eps_tol)) + 1 
-    #     h = h / 10
-    #     print("h=",h,"m=",m,"n_iter=",n_iter)
-
-    #new 
     if h < 0 : 
         n_iter = int(np.floor(np.log( 1 / eps_tol )) + 1)
         delta = eps_tol ** (1/n_iter)
-        if nu == 0 :
-            m = 8*(kappa - 1) / delta**2 + 8*kappa/delta 
+        h = 1 / ((4/delta) * (L - mu) + 2*L)
+        if nu == mu: 
+            m = (4*(kappa - 1)/delta + 2*kappa) * np.log(2/delta + (2*kappa - 1)/(kappa - 1))
             m = int(m) + 1
-            h = 1 / ((4/delta) * (L - mu) + 4*L)
-        elif nu == mu :    
-            h = 1 / ((4/delta) * (L - mu) + 2*L)
-            if kappa < 2 : 
-                m = (4*(kappa - 1)/delta + 2*kappa) * np.log(2/delta + (2*kappa - 1)/(kappa - 1))
-                m = int(m) + 1
-            else :
-                m = (6*kappa/delta) * np.log(5/delta)
-                m = int(m) + 1
-        h = h / 10
-        print("h=",h,"m=",m,"n_iter=",n_iter)
+        elif nu == 0:
+            m = 8*(kappa - 1) / delta**2 + 8*kappa/delta + (2*kappa**2) / (kappa-1)
+            m = int(m) + 1
+        h = h / 3
+        print("h=",h,"m=",m,"n_iter=",n_iter,"delta=",delta,)
+
+    #new 
+    # if h < 0 : 
+    #     n_iter = int(np.floor(np.log( 1 / eps_tol )) + 1)
+    #     delta = eps_tol ** (1/n_iter)
+    #     if nu == 0 :
+    #         m = 8*(kappa - 1) / delta**2 + 8*kappa/delta 
+    #         m = int(m) + 1
+    #         h = 1 / ((4/delta) * (L - mu) + 4*L)
+    #     elif nu == mu :    
+    #         h = 1 / ((4/delta) * (L - mu) + 2*L)
+    #         if kappa < 2 : 
+    #             m = (4*(kappa - 1)/delta + 2*kappa) * np.log(2/delta + (2*kappa - 1)/(kappa - 1))
+    #             m = int(m) + 1
+    #         else :
+    #             m = (6*kappa/delta) * np.log(5/delta)
+    #             m = int(m) + 1
+    #     h = h / 10
 
     #Compute probability and expectaiton for t
     t_val = np.arange(1,m+1) 
-    t_probs = (1- nu*h)**(m-t_val)
-    t_probs /= np.sum(t_probs)
+    t_prob = (1- nu*h)**(m-t_val)
+    t_probs = t_prob / np.sum(t_prob)
     t_expectation = np.dot(t_val,t_probs)
     t = 0
 
+    print("h=",h,"m=",m,"n_iter=",n_iter,"beta=",np.sum(t_prob))
 
     k=0
     
