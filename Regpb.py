@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import norm 
 from scipy.linalg import svdvals
 
-class L2regLS(object):
+class RegressPb(object):
     """
     Class for L2 regularized Least Squares
 
