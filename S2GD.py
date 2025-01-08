@@ -10,7 +10,7 @@ def S2GD(x0,problem,xtarget,h,m,nu,eps_tol,plus=False,alpha=2,n_iter=100,verbose
         Inputs:
             x0: Initial vector
             problem
-            xtarget: Target minimum (unknown in practice!)
+            xtarget: Target minimum 
             h : stepsize if < 0, we choose the best parameters m,h,n_iter
             m : max of # of Stochastic Gradient per epoch
             nu : lower bound on mu (the strongly convex cste of f)

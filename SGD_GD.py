@@ -10,7 +10,7 @@ def stoch_grad(x0,problem,xtarget,stepchoice=0,step0=1, n_iter=1000,nb=1,with_re
         Inputs:
             x0: Initial vector
             problem
-            xtarget: Target minimum (unknown in practice!)
+            xtarget: Target minimum 
             stepchoice: Strategy for computing the stepsize 
                 0: Constant step size equal to 1/L
                 <0: Step size decreasing in 1/(k+1)**t

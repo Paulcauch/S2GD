@@ -4,14 +4,14 @@ from scipy.linalg import svdvals
 
 class RegressPb(object):
     """
-    Class for L2 regularized Least Squares
+    Class for L2 regularized Least Squares and Logistic regularized regression
 
     A: Data matrix (features) nxd
     y: Data vector (labels) n
     n,d: Dimensions of A
     loss: Loss function to be considered in the regression
         'l2': Least-squares loss 
-        'logit': Logistic loss
+        'logistic11': Logistic loss
     lbda: Regularization parameter
     """
 

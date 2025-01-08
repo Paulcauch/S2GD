@@ -9,7 +9,7 @@ def SAGA(x0,problem,xtarget,gamma,eps_tol,n_iter=100,verbose=True,fast=False):
         Inputs:
             x0: Initial vector
             problem
-            xtarget: Target minimum (unknown in practice!)
+            xtarget: Target minimum 
             gamma : stepsize if < 0, we choose the best gamma 
             n_iter: Number of iterations, used as stopping criterion
             verbose: Boolean indicating whether information should be plot at every iteration (Default: False)
